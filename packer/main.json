@@ -1,0 +1,58 @@
+{
+  "variables": {
+    "disk_size": "8192",
+    "iso_location": "file:///Users/tim/Downloads/CentOS-7-x86_64-Minimal-1511.iso",
+    "iso_md5": "88c0437f0a14c6e2c94426df9d43cd67",
+    "box_ram": "1024",
+    "box_cpus": "2",
+    "http_proxy": "{{ env `packer_http_proxy` }}"
+  },
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant'| {{ .Vars }} sudo -E -S sh '{{.Path}}'",
+      "environment_vars": [
+        "http_proxy={{ user `http_proxy` }}",
+        "https_proxy={{ user `http_proxy` }}"
+      ],
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/guestadds.sh",
+        "scripts/cleanup.sh"
+      ]
+    }
+  ],
+  "builders": [
+     {
+        "type": "virtualbox-iso",
+        "guest_os_type": "RedHat_64",
+        "boot_command": [
+          "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+        ],
+        "http_directory": "http",
+        "boot_wait": "10s",
+        "disk_size": "{{user `disk_size`}}",
+        "iso_url": "{{ user `iso_location` }}",
+        "iso_checksum": "{{ user `iso_md5` }}",
+        "iso_checksum_type": "md5",
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "ssh_wait_timeout": "10000s",
+        "guest_additions_path": "VBoxGuestAdditions_{{ .Version }}.iso",
+        "virtualbox_version_file": ".vbox_version",
+        "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+        "vboxmanage": [
+          [ "modifyvm", "{{.Name}}", "--memory", "{{ user `box_ram` }}" ],
+          [ "modifyvm", "{{.Name}}", "--cpus", "{{ user `box_cpus` }}" ],
+          [ "modifyvm", "{{.Name}}", "--macaddress1", "080027a79e8f" ]
+        ]
+      }
+  ],
+  "post-processors": [
+    {
+      "output": "builds/centos72-consul.box",
+      "type": "vagrant",
+      "keep_input_artifact": false
+    }
+  ]
+}
