@@ -18,11 +18,9 @@ MACAddress=10:bf:48:d7:68:e1
 EOF
 
 cat > /etc/systemd/network/br0.netdev <<EOF
-[Match]
-Type=bridge
-
-[Link]
-MACAddress=10:bf:48:d7:68:e1
+[NetDev]
+Name=br0
+Kind=bridge
 EOF
 
 cat > /etc/systemd/network/br0.network <<EOF
