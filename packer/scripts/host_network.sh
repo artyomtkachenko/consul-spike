@@ -48,5 +48,3 @@ Name=ve-*
 [Network]
 Bridge=br0
 EOF
-
-systemctl enable machines.target
