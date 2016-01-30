@@ -18,6 +18,8 @@
       "scripts": [
         "scripts/base.sh",
         "scripts/guestadds.sh",
+        "scripts/host_network.sh",
+        "scripts/containers.sh",
         "scripts/cleanup.sh"
       ]
     }
@@ -50,7 +52,7 @@
   ],
   "post-processors": [
     {
-      "output": "builds/centos72-consul.box",
+      "output": "builds/centos72-consul-new.box",
       "type": "vagrant",
       "keep_input_artifact": false
     }

@@ -6,8 +6,8 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  config.vm.box = "centos72-consult.box"
-  config.vm.box_url = 'file:///Users/tim/work/git/personal/consul-spike/packer/builds/centos72-consul.box'
+  config.vm.box = "centos72-consul-new.box"
+  config.vm.box_url = 'file:///Users/tim/work/git/personal/consul-spike/packer/builds/centos72-consul-new.box'
 
   config.vm.network "forwarded_port", guest: 8040, host: 8040
 
