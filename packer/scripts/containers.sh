@@ -2,10 +2,11 @@
 set -e
 
 MCTL_ROOT=/var/lib/machines
-#Baking a Base container, we will use it later when we do Vagrant provision
+echo "Baking a Base container, we will use it later when we do Vagrant provision"
+
 yum install vim-minimal iputils haproxy iproute systemd-networkd systemd-resolved  systemd passwd yum -y --releasever=7  --nogpg --installroot="${MCTL_ROOT}/base"
 
-#Configuring network
+echo "Configuring network"
 mkdir -p "${MCTL_ROOT}/base/etc/systemd/network"
 
 cat > "${MCTL_ROOT}/base/etc/systemd/network/80-container-host0.network" << EOF
@@ -24,8 +25,10 @@ EOF
 #Required for machinectl login base
 echo "pts/0" >> "${MCTL_ROOT}/base/etc/securetty"
 
-#Configuring systemd-resolved 
+echo "Configuring systemd-resolved"
 systemd-nspawn -D "${MCTL_ROOT}/base" rm -f /etc/resolv.conf
+
+sleep 5
 systemd-nspawn -D "${MCTL_ROOT}/base" ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
 #We want resolve containers by a name
@@ -54,19 +57,22 @@ automount:  files
 aliases:    files nisplus
 EOF
 
-#Making root user paswwordless
-sed -i--regexp-extended  's/^root.+/root::16831:0:99999:7:::/' "${MCTL_ROOT}/base/etc/shadow"
+echo "Making root user paswwordless"
+sed -i --regexp-extended  's/^root.+/root::16831:0:99999:7:::/' "${MCTL_ROOT}/base/etc/shadow"
 
-#Installing Consul tools
+echo "Installing Consul tools"
+
 curl -sk https://releases.hashicorp.com/consul/0.6.3/consul_0.6.3_linux_amd64.zip -o /root/consul.zip
-unzip /root/consul.zip -d /root/
+unzip /root/consul.zip -d /usr/local/bin
 
 curl -sk https://releases.hashicorp.com/consul-template/0.12.2/consul-template_0.12.2_linux_amd64.zip -o /root/consul-template.zip
-unzip /root/consul-template.zip -d /root/
+unzip /root/consul-template.zip -d /usr/local/bin
 
+chmod 755 /usr/local/bin/consul
+chmod 755 /usr/local/bin/consul-template
 
-cp /root/consul "${MCTL_ROOT}/base/root/"
-cp /root/consul-template. "${MCTL_ROOT}/base/root/"
+cp /usr/local/bin/consul "${MCTL_ROOT}/base//usr/local/bin/"
+cp /usr/local/bin/consul-template "${MCTL_ROOT}/base//usr/local/bin/"
 
 #Start containers on a boot
 systemctl enable machines.target

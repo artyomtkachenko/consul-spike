@@ -12,3 +12,7 @@ for ndev in `ls -1 /etc/sysconfig/network-scripts/ifcfg-*`; do
         sed -i '/^UUID/d' "$ndev"
     fi
 done
+cd /usr/lib/modules && ls /usr/lib/modules |grep -v `uname -r`|xargs -I xxx rm -rf xxx
+
+rm -f /root/consul.zip
+rm -f /root/consul-template.zip
