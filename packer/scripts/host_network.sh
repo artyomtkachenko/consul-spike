@@ -48,3 +48,32 @@ Name=ve-*
 [Network]
 Bridge=br0
 EOF
+
+#We want resolve containers by a name
+cat > /etc/nsswitch.conf <<EOF 
+passwd:     files sss mymachines
+shadow:     files sss
+group:      files sss mymachines
+
+#sequence does metter
+hosts:      files resolve mymachines myhostname
+
+bootparams: nisplus [NOTFOUND=return] files
+
+ethers:     files
+netmasks:   files
+networks:   files
+protocols:  files
+rpc:        files
+services:   files sss
+
+netgroup:   files sss
+
+publickey:  nisplus
+
+automount:  files
+aliases:    files nisplus
+EOF
+
+rm -f /etc/resolv.conf
+ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
