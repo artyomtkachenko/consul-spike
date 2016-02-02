@@ -5,7 +5,9 @@
     "iso_md5": "88c0437f0a14c6e2c94426df9d43cd67",
     "box_ram": "1024",
     "box_cpus": "2",
-    "http_proxy": "{{ env `packer_http_proxy` }}"
+    "http_proxy": "{{ env `packer_http_proxy` }}",
+    "consul_version": "0.6.3",
+    "consul_template_version": "0.12.2"
   },
   "provisioners": [
     {
@@ -13,13 +15,18 @@
       "execute_command": "echo 'vagrant'| {{ .Vars }} sudo -E -S sh '{{.Path}}'",
       "environment_vars": [
         "http_proxy={{ user `http_proxy` }}",
-        "https_proxy={{ user `http_proxy` }}"
+        "https_proxy={{ user `http_proxy` }}",
+        "CONSUL_VERSION={{ user `consul_version` }}",
+        "CONSUL_TEMPLATE_VERSION={{ user `consul_template_version` }}",
+        "MCTL_ROOT=/var/lib/machines"
       ],
       "scripts": [
         "scripts/base.sh",
         "scripts/guestadds.sh",
         "scripts/host_network.sh",
+        "scripts/consul.sh",
         "scripts/containers.sh",
+        "scripts/haproxy.sh",
         "scripts/cleanup.sh"
       ]
     }

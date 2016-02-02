@@ -1,10 +1,8 @@
 #!/bin/bash
 set -e
+echo "Baking a Base container. We will use it later, when we do Vagrant provision"
 
-MCTL_ROOT=/var/lib/machines
-echo "Baking a Base container, we will use it later when we do Vagrant provision"
-
-yum install vim-minimal iputils haproxy iproute systemd-networkd systemd-resolved  systemd passwd yum -y --releasever=7  --nogpg --installroot="${MCTL_ROOT}/base"
+yum install vim-minimal iputils iproute systemd-networkd systemd-resolved  systemd passwd -y --releasever=7  --nogpg --installroot="${MCTL_ROOT}/base"
 
 echo "Configuring network"
 mkdir -p "${MCTL_ROOT}/base/etc/systemd/network"
@@ -60,19 +58,37 @@ EOF
 echo "Making root user paswwordless"
 sed -i --regexp-extended  's/^root.+/root::16831:0:99999:7:::/' "${MCTL_ROOT}/base/etc/shadow"
 
-echo "Installing Consul tools"
-
-curl -sk https://releases.hashicorp.com/consul/0.6.3/consul_0.6.3_linux_amd64.zip -o /root/consul.zip
-unzip /root/consul.zip -d /usr/local/bin
-
-curl -sk https://releases.hashicorp.com/consul-template/0.12.2/consul-template_0.12.2_linux_amd64.zip -o /root/consul-template.zip
-unzip /root/consul-template.zip -d /usr/local/bin
-
-chmod 755 /usr/local/bin/consul
-chmod 755 /usr/local/bin/consul-template
-
-cp /usr/local/bin/consul "${MCTL_ROOT}/base//usr/local/bin/"
+#Consul binaries are installed by consul.sh
+cp /usr/local/bin/consul "${MCTL_ROOT}/base/usr/local/bin/"
 cp /usr/local/bin/consul-template "${MCTL_ROOT}/base//usr/local/bin/"
+
+mkdir "${MCTL_ROOT}/base/etc/consul.d"
+cat > "${MCTL_ROOT}/base/etc/consul.json" << EOF
+{
+  "datacenter": "test-lab1",
+  "data_dir": "/tmp/consul",
+  "log_level": "INFO",
+  "bind_addr": "0.0.0.0"
+}
+EOF
+
+cat > "${MCTL_ROOT}/base/etc/systemd/system/consul.service" << EOF
+[Unit]
+Description=consul agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+ExecStart=/usr/local/bin/consul agent -config-file /etc/consul.json -config-dir /etc/consul.d
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemd-nspawn -D "${MCTL_ROOT}/base" systemctl enable consul.service
+sleep 5
 
 #Start containers on a boot
 systemctl enable machines.target
