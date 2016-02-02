@@ -42,6 +42,11 @@ KillSignal=SIGINT
 WantedBy=multi-user.target
 EOF
 
+systemctl enable consul.service
+
+# We do not need it for this Lab
+systemctl disable firewalld.service
+
 # cat > /etc/consul.d/foo << EOF
 # {
 #     "service": {

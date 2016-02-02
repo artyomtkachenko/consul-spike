@@ -80,7 +80,7 @@ After=network-online.target
 
 [Service]
 Restart=on-failure
-ExecStart=/usr/local/bin/consul agent -config-file /etc/consul.json -config-dir /etc/consul.d
+ExecStart=/usr/local/bin/consul agent -join 10.0.2.15 -config-file /etc/consul.json -config-dir /etc/consul.d
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 
