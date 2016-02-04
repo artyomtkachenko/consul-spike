@@ -6,4 +6,4 @@
   * 2 Vault servers to play with HashiCorp's Vault
   
 
-# The work is on going status. 
+# Project status - ongoing. 
