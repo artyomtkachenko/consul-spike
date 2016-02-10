@@ -11,13 +11,13 @@ cat > "${MCTL_ROOT}/${i}/etc/consul.d/haproxy.json" << EOF
 {
     "service": {
         "name": "haproxy",
-        "port": 9090,
+        "port": 80,
         "tags": [
             "staging",
             "haproxy"
         ],
         "check": {
-          "script": "curl localhost:9090 >/dev/null 2>&1",
+          "script": "curl localhost >/dev/null 2>&1",
            "interval": "10s"
         }
     }
