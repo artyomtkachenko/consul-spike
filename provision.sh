@@ -1,4 +1,4 @@
-#!/bib/bash
+#!/bin/bash
 echo "Building simple LBs"
 MCTL_ROOT=/var/lib/machines
 
@@ -24,10 +24,10 @@ cat > "${MCTL_ROOT}/${i}/etc/consul.d/haproxy.json" << EOF
 }
 EOF
 
-echo "Configuring Consul Templae"
-  mkdir "${MCTL_ROOT}/etc/consul-template.d"
+echo "Configuring Consul Template"
+  mkdir -p "${MCTL_ROOT}/${i}/etc/consul-template.d"
 
-cat "${MCTL_ROOT}/etc/consul-template.d/haproxy.cfg.ctmpl" << EOF
+cat > "${MCTL_ROOT}/${i}/etc/consul-template.d/haproxy.cfg.ctmpl" << EOF
 global
     log         127.0.0.1 local2
     chroot      /var/lib/haproxy
@@ -74,7 +74,7 @@ backend simpleapp
 EOF
  
   echo "Generting configuration for Consul Template"
-cat > "${MCTL_ROOT}/etc/consul-template.hcl" << EOF
+cat > "${MCTL_ROOT}/${i}/etc/consul-template.hcl" << EOF
 consul = "0.0.0.0:8500"
 
 template {
@@ -101,7 +101,7 @@ KillSignal=SIGINT
 WantedBy=multi-user.target
 EOF
 
-systemd-nspawn -D "${MCTL_ROOT}/base" systemctl enable consul-template.service
+systemd-nspawn -D "${MCTL_ROOT}/${i}" systemctl enable consul-template.service
 sleep 5
 
 done

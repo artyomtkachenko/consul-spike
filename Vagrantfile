@@ -12,6 +12,8 @@ Vagrant.configure(2) do |config|
 
   config.vm.network "forwarded_port", guest: 8040, host: 8040
 
+  config.vm.provision "shell", path: "provision.sh" #Idially should be inline script
+
   config.ssh.password = 'vagrant'
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
