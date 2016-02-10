@@ -46,17 +46,3 @@ systemctl enable consul.service
 
 # We do not need it for this Lab
 systemctl disable firewalld.service
-
-# cat > /etc/consul.d/foo << EOF
-# {
-#     "service": {
-#         "name": "foo",
-#         "port": 8080,
-#         "tags": [
-#             "staging",
-#             "db",
-#             "primary"
-#         ]
-#     }
-# }
-# EOF
